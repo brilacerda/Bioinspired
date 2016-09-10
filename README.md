@@ -2,7 +2,7 @@
 
 Especificação Mini-projeto – 8 rainhas
 
-### H3 Primeira parte:
+### Primeira parte:
 * Representação (genótipo): string de bits
 * Recombinação: “cut-and-crossfill” crossover
 * Probabilidade de Recombinação: 90%
@@ -16,12 +16,12 @@ Especificação Mini-projeto – 8 rainhas
 * Condição de término: Encontrar a solução, ou 10.000 avaliações de fitness
 * Fitness?
 
-### H3 Segunda parte:
-* Implementar possíveis melhorias mudando:
-⋅⋅* Representação
-⋅⋅* Recombinação 
-⋅⋅* Mutação
-⋅⋅* Seleção de pais – roleta?
-⋅⋅* Seleção de sobreviventes: geracional ou substituição do pior
-⋅⋅* Tamanho da população: 10? 30? 50? 70? 120? 200?
-⋅⋅* O fitness pode ser melhorado?
+### Segunda parte:
+#### Implementar possíveis melhorias mudando:
+* Representação
+* Recombinação 
+* Mutação
+* Seleção de pais – roleta?
+* Seleção de sobreviventes: geracional ou substituição do pior
+* Tamanho da população: 10? 30? 50? 70? 120? 200?
+* O fitness pode ser melhorado?
