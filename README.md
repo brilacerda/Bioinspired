@@ -1,5 +1,7 @@
 # Bioinspired
 
+**_Made in python version 3.4.3_**
+
 Especificação Mini-projeto – 8 rainhas
 
 ### Primeira parte:
