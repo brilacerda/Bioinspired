@@ -18,21 +18,21 @@ sample = ['000', '001', '010', '011', '100', '101', '110', '111']
 print (population)
 
 def hasDuplicatedColumn(ind):
-		'''
-			Transforms the individual into a set and see if there is any 
-			repeated numbers, indicating the set to be smaller then 8.
-		'''
-	 if len(set(ind)) < 8:
+	'''
+		Transforms the individual into a set and see if there is any 
+		repeated numbers, indicating the set to be smaller then 8.
+	'''
+	if len(set(ind)) < 8:
 	 	return True
-	 else: 
-	 	return False
+	else: 
+		return False
 
 def hasMatchAtBottomToTopDiagonal(ind):
-		'''
-			Identify all diagonals from left to right, from the bottom to 
-			the top by the sum of it. In the same diagonal the sum must 
-			be the equal.
-		'''
+	'''
+		Identify all diagonals from left to right, from the bottom to 
+		the top by the sum of it. In the same diagonal the sum must 
+		be the equal.
+	'''
 	indSum = []
 	for i in range(8):
 		indSum.append(i + ind[i])
@@ -43,11 +43,11 @@ def hasMatchAtBottomToTopDiagonal(ind):
 	 	return False
 
 def hasMatchAtToptoBottomDiagonal(ind):
-		'''
-			Identify all diagonals from left to right from the top to the 
-			bottom by the reduction of the coordinates to the extremes -
-			left and top - and comparing it.
-		'''
+	'''
+		Identify all diagonals from left to right from the top to the 
+		bottom by the reduction of the coordinates to the extremes -
+		left and top - and comparing it.
+	'''
 	diag = []
 	for i in range(8):
 		# linha < coluna
