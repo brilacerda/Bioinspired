@@ -17,6 +17,13 @@ population = {}
 sample = ['000', '001', '010', '011', '100', '101', '110', '111']
 print (population)
 
+# convertendo pra fenótipo
+def getFenotype(ind):
+    arr = []
+    for i in range(8):
+            arr.append(int(ind[i], 2))
+    return arr
+
 def hasDuplicatedColumn(ind):
 	'''
 		Transforms the individual into a set and see if there is any 
@@ -62,6 +69,7 @@ def hasMatchAtToptoBottomDiagonal(ind):
 	 	return False		
 
 def checkSolution(ind):
+	ind = getFenotype(ind)
 	if hasDuplicatedColumn(ind):
 		return True
 	elif hasMatchAtBottomToTopDiagonal(ind):
