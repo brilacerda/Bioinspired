@@ -13,9 +13,10 @@ toBinary = {
 
 # Criar a representação da estrutura ex.:
 # [000, 001, 010, 011, 100, 101, 110, 111]
+population_size = 10
 population = {}
 sample = ['000', '001', '010', '011', '100', '101', '110', '111']
-print (population)
+fitness = []
 
 # convertendo pra fenótipo
 def getFenotype(ind):
@@ -29,10 +30,7 @@ def hasDuplicatedColumn(ind):
 		Transforms the individual into a set and see if there is any 
 		repeated numbers, indicating the set to be smaller then 8.
 	'''
-	if len(set(ind)) < 8:
-	 	return True
-	else: 
-		return False
+	return (8 - len(set(ind)))
 
 def hasMatchAtBottomToTopDiagonal(ind):
 	'''
@@ -44,16 +42,15 @@ def hasMatchAtBottomToTopDiagonal(ind):
 	for i in range(8):
 		indSum.append(i + ind[i])
 	
-	if len(set(indSum)) < 8:
-		return True
-	else: 
-	 	return False
+	return (8 - len(set(indSum)))
 
 def hasMatchAtToptoBottomDiagonal(ind):
 	'''
 		Identify all diagonals from left to right from the top to the 
 		bottom by the reduction of the coordinates to the extremes -
 		left and top - and comparing it.
+		ex.: (1, 3) -> smaller number = 1; (1-1, 3-1) = (0, 2) extreme top.
+		ex.: (5, 4) -> smaller number = 4; (5-4, 4-4) = (1, 0) extreme left.
 	'''
 	diag = []
 	for i in range(8):
@@ -62,21 +59,24 @@ def hasMatchAtToptoBottomDiagonal(ind):
 			diag.append((0, i - ind[i]))
 		else:
 			diag.append((ind[i] - i, 0))
-	print (diag)
-	if len(set(diag)) < 8:
-		return True
-	else: 
-	 	return False		
+	return (8 - len(set(diag)))
 
-def checkSolution(ind):
+def checkSolution(ind, i):
+	'''
+		If i == -1 it means we are checking the first generation, so we need 
+		to populate the fitness first.
+	'''
+
 	ind = getFenotype(ind)
-	if hasDuplicatedColumn(ind):
-		return True
-	elif hasMatchAtBottomToTopDiagonal(ind):
-		return True
-	elif hasMatchAtToptoBottomDiagonal(ind):
+	print(ind)
+	colisions = hasDuplicatedColumn(ind) + hasMatchAtBottomToTopDiagonal(ind) + hasMatchAtToptoBottomDiagonal(ind)
+	if colisions == 0:
 		return True
 	else:
+		if i == -1:
+			fitness.append(colisions)
+		else:
+			fitness[i] = colisions
 		return False
 
 # def individualToBinary(ind):
@@ -90,16 +90,17 @@ def checkSolution(ind):
 
 # Inicialização aleatória
 # Geração de 100 indivíduos
-for i in range(10):
+for i in range(population_size):
 	shuffle(sample)
 
 	# Avaliação da solução
-	# if checkSolution(sample)
-	# 	print ("Solution %s found at iteration #%d" % sample, i)
-	# 	break
-
-	population[i] = sample;
-	print (sample)
+	if checkSolution(sample, -1):
+		print ("Solution %s found at iteration #%d" % sample, i)
+		break
+	else:
+		population[i] = sample;
+		print (sample)
+		print ("fitness ", fitness)
 
 
 # convertendo pra fenótipo
