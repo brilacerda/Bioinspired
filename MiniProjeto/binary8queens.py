@@ -79,6 +79,36 @@ def checkSolution(ind, i):
 			fitness[i] = colisions
 		return False
 
+def two_outta_five():
+	'''
+		Catches the first 2 random individuals, give the best variable
+		the index of the smaller fitness and the second best gets the 
+		remaining.
+		Keep comparing the smaller fitness and return the 2 bests outta
+		five random individuals.
+	'''
+	five_guys = []
+	best = snd_best = population_size
+	for i in range(5):
+		five_guys.append(randrange(population_size))
+		if i > 1:
+			if fitness[five_guys[i]] < fitness[best]:
+				snd_best = best
+				best = five_guys[i]
+			elif fitness[five_guys[i]] < fitness[snd_best]:
+				snd_best = five_guys[i]
+		elif i == 1:
+			if fitness[five_guys[0]] < fitness[five_guys[1]]:
+				best = five_guys[0]
+				snd_best = five_guys[1]
+			else:
+				best = five_guys[1]
+				snd_best = five_guys[0]
+		
+	print (five_guys)
+	return (best, snd_best)
+
+
 # def individualToBinary(ind):
 # 	temp = []
 # 	for i in range(8):
@@ -101,6 +131,8 @@ for i in range(population_size):
 		population[i] = sample;
 		print (sample)
 		print ("fitness ", fitness)
+
+print (two_outta_five())
 
 
 # convertendo pra fenótipo
