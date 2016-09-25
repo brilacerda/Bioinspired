@@ -13,10 +13,31 @@ toBinary = {
 
 # Criar a representação da estrutura ex.:
 # [000, 001, 010, 011, 100, 101, 110, 111]
-population_size = 10
+population_size = 100
 population = {}
 sample = ['000', '001', '010', '011', '100', '101', '110', '111']
 fitness = []
+
+def main():
+	# Inicialização aleatória
+	# Geração de 100 indivíduos
+	for i in range(population_size):
+		shuffle(sample)
+
+		# Avaliação da solução
+		if checkSolution(sample, -1):
+			print ("Solution ", sample, "found at iteration #", i)
+			break
+		else:
+			population[i] = sample;
+			print (sample)
+			print ("fitness ", fitness)
+
+	# print (two_outta_five())
+	# print ( "worst solution: ", get_the_worst_fitness())
+
+	# convertendo pra fenótipo
+	# print int('00100001', 2)
 
 # convertendo pra fenótipo
 def getFenotype(ind):
@@ -105,9 +126,42 @@ def two_outta_five():
 				best = five_guys[1]
 				snd_best = five_guys[0]
 		
-	print (five_guys)
+	# print (five_guys)
 	return (best, snd_best)
 
+def get_the_worst_fitness():
+	worst = -1
+	for i in range(population_size):
+		if fitness[i] > worst:
+			worst = fitness[i]
+	return worst
+
+def binMutation(ind, position):
+	mut = randrange(8)
+	element = ind[mut]
+	mutation = ''
+	for i in range(3):
+		if i == position:
+			if element[i] == '1':
+				mutation += '0'
+			else:
+				mutation += '1'
+		else:
+			mutation += element[i]
+	ind[mut] = mutation
+	return ind
+
+def mutation(ind):
+	rand1 = randrange(8)
+	rand2 = randrange(8)
+	if rand1 == rand2:
+		# try again
+		return mutation(ind)
+	else:
+		temp = ind[rand1]
+		ind[rand1] = ind[rand2]
+		ind[rand2] = temp
+		return ind
 
 # def individualToBinary(ind):
 # 	temp = []
@@ -116,24 +170,3 @@ def two_outta_five():
 # 		print (temp[i])
 
 # 	return temp
-
-
-# Inicialização aleatória
-# Geração de 100 indivíduos
-for i in range(population_size):
-	shuffle(sample)
-
-	# Avaliação da solução
-	if checkSolution(sample, -1):
-		print ("Solution %s found at iteration #%d" % sample, i)
-		break
-	else:
-		population[i] = sample;
-		print (sample)
-		print ("fitness ", fitness)
-
-print (two_outta_five())
-
-
-# convertendo pra fenótipo
-# print int('00100001', 2)
