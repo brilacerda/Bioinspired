@@ -34,12 +34,10 @@ def main():
 		else:
 			population[i] = sample;
 			print ("ind #%s "%i)
-			print (sample)
-			print ("fitness ", fitness)
 
 	if not foundSolution:
-		for g in range(9900):
-			print ("generation #", g)
+		for g in range(10000):
+			print ("generation #", g+1)
 			# every loop run, we check fitness twice
 			g -= 2
 
@@ -48,10 +46,8 @@ def main():
 
 			# 90% chance to crossover
 			crossChance = randrange(101)
-			print ("crossover chance: ", crossChance)
-			if crossChance < 10:
-				print (crossChance, " crossover")
-				children = crossover(selectedParents[0], selectedParents[1])
+			if crossChance > 10:
+				children = crossover(population[selectedParents[0]], population[selectedParents[1]])
 
 			# 40% chance to perform a mutation for each child
 			if randrange(101) < 40:
@@ -61,10 +57,12 @@ def main():
 			
 			# Get all the fitnesses & check solutions
 			f1 = getFitness(children[0])
+			print ("f1: ", f1)
 			if f1 == 0:
 				print ("Solution ", children[0], "found at iteration #", g, " when checking children solution")
 				break
 			f2 = getFitness(children[1])
+			print ("f2: ", f2)
 			if f2 == 0:
 				print ("Solution ", children[1], "found at iteration #", g, "  when checking children solution")
 				break
@@ -72,17 +70,22 @@ def main():
 			# Selecting the individuals for the next generation
 			if worsts == []:
 				getTheWorsts()
-			print ("worsts: " , worsts)
-			population[worsts[0]] = f1
+			# print ("worsts: " , worsts)
+			population[worsts[0]] = children[0]
+			fitness[worsts[0]] = f1
 			worsts.pop(0)
+
 			if worsts == []:
 				getTheWorsts()
-			print ("worsts: " , worsts)
-			population[worsts[0]] = f2
+			# print ("worsts: " , worsts)
+			population[worsts[0]] = children[1]
+			fitness[worsts[0]] = f2
 			worsts.pop(0)
 
 			# convertendo pra fenótipo
 			# print int('00100001', 2)
+	print ("No solution was found in 10.000 fenotype consultings")
+fitness = []
 
 # convertendo pra fenótipo
 def getFenotype(ind):
@@ -132,8 +135,8 @@ def getFitness(ind):
 		The fitness end up being the number of colisions this time
 	'''
 	ind = getFenotype(ind)
-	print(ind)
 	colisions = hasDuplicatedColumn(ind) + hasMatchAtBottomToTopDiagonal(ind) + hasMatchAtToptoBottomDiagonal(ind)
+	print ("individual ", ind, "colisions ", colisions)
 	return colisions
 
 def checkSolution(ind, i=0):
@@ -161,7 +164,8 @@ def two_outta_five():
 		five random individuals.
 	'''
 	five_guys = []
-	best = snd_best = population_size
+	best = population_size
+	snd_best = population_size
 	for i in range(5):
 		five_guys.append(randrange(population_size))
 		if i > 1:
@@ -186,13 +190,15 @@ def get_the_worst_fitness():
 	for i in range(population_size):
 		if fitness[i] > worst:
 			worst = fitness[i]
+	print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> WORST: ", worst)
 	return worst
 
 def getTheWorsts():
 	worstFit = get_the_worst_fitness()
 	for i in range(population_size):
 		if fitness[i] == worstFit:
-			worsts.append(i)
+				worsts.append(i)
+				print ("getTheWorsts: ",  worsts)
 
 def binMutation(ind, position):
 	mut = randrange(8)
@@ -225,7 +231,6 @@ def crossover(ind1, ind2):
 	children1 = []
 	children2 = []
 	cut = randrange(2)
-	print (cut)
 	for i in range(8):
 		child1 = child2 = ''
 		for x in range(3):
