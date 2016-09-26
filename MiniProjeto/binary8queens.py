@@ -17,8 +17,10 @@ population_size = 100
 population = {}
 sample = ['000', '001', '010', '011', '100', '101', '110', '111']
 fitness = []
+worsts = []
 
 def main():
+	foundSolution = False
 	# Inicialização aleatória
 	# Geração de 100 indivíduos
 	for i in range(population_size):
@@ -26,18 +28,61 @@ def main():
 
 		# Avaliação da solução
 		if checkSolution(sample, -1):
-			print ("Solution ", sample, "found at iteration #", i)
+			print ("Solution ", sample, "found at iteration #", i, "when creating population")
+			foundSolution = True
 			break
 		else:
 			population[i] = sample;
+			print ("ind #%s "%i)
 			print (sample)
 			print ("fitness ", fitness)
 
-	# print (two_outta_five())
-	# print ( "worst solution: ", get_the_worst_fitness())
+	if not foundSolution:
+		for g in range(9900):
+			print ("generation #", g)
+			# every loop run, we check fitness twice
+			g -= 2
 
-	# convertendo pra fenótipo
-	# print int('00100001', 2)
+			selectedParents = two_outta_five()
+			children = [population[selectedParents[0]], population[selectedParents[1]]]
+
+			# 90% chance to crossover
+			crossChance = randrange(101)
+			print ("crossover chance: ", crossChance)
+			if crossChance < 10:
+				print (crossChance, " crossover")
+				children = crossover(selectedParents[0], selectedParents[1])
+
+			# 40% chance to perform a mutation for each child
+			if randrange(101) < 40:
+				binMutation(children[0], randrange(3))
+			if randrange(101) < 40:
+				binMutation(children[1], randrange(3))
+			
+			# Get all the fitnesses & check solutions
+			f1 = getFitness(children[0])
+			if f1 == 0:
+				print ("Solution ", children[0], "found at iteration #", g, " when checking children solution")
+				break
+			f2 = getFitness(children[1])
+			if f2 == 0:
+				print ("Solution ", children[1], "found at iteration #", g, "  when checking children solution")
+				break
+
+			# Selecting the individuals for the next generation
+			if worsts == []:
+				getTheWorsts()
+			print ("worsts: " , worsts)
+			population[worsts[0]] = f1
+			worsts.pop(0)
+			if worsts == []:
+				getTheWorsts()
+			print ("worsts: " , worsts)
+			population[worsts[0]] = f2
+			worsts.pop(0)
+
+			# convertendo pra fenótipo
+			# print int('00100001', 2)
 
 # convertendo pra fenótipo
 def getFenotype(ind):
@@ -82,15 +127,22 @@ def hasMatchAtToptoBottomDiagonal(ind):
 			diag.append((ind[i] - i, 0))
 	return (8 - len(set(diag)))
 
-def checkSolution(ind, i):
+def getFitness(ind):
 	'''
-		If i == -1 it means we are checking the first generation, so we need 
-		to populate the fitness first.
+		The fitness end up being the number of colisions this time
 	'''
-
 	ind = getFenotype(ind)
 	print(ind)
 	colisions = hasDuplicatedColumn(ind) + hasMatchAtBottomToTopDiagonal(ind) + hasMatchAtToptoBottomDiagonal(ind)
+	return colisions
+
+def checkSolution(ind, i=0):
+	'''
+		The variable i is the position in the population array.
+		If i == -1 it means we are checking the first generation, 
+		so we need to populate the fitness first.
+	'''
+	colisions = getFitness(ind)
 	if colisions == 0:
 		return True
 	else:
@@ -103,8 +155,8 @@ def checkSolution(ind, i):
 def two_outta_five():
 	'''
 		Catches the first 2 random individuals, give the best variable
-		the index of the smaller fitness and the second best gets the 
-		remaining.
+		the index of the smaller fitness and the second best gets the
+		second best'.
 		Keep comparing the smaller fitness and return the 2 bests outta
 		five random individuals.
 	'''
@@ -136,6 +188,12 @@ def get_the_worst_fitness():
 			worst = fitness[i]
 	return worst
 
+def getTheWorsts():
+	worstFit = get_the_worst_fitness()
+	for i in range(population_size):
+		if fitness[i] == worstFit:
+			worsts.append(i)
+
 def binMutation(ind, position):
 	mut = randrange(8)
 	element = ind[mut]
@@ -162,6 +220,27 @@ def mutation(ind):
 		ind[rand1] = ind[rand2]
 		ind[rand2] = temp
 		return ind
+
+def crossover(ind1, ind2):
+	children1 = []
+	children2 = []
+	cut = randrange(2)
+	print (cut)
+	for i in range(8):
+		child1 = child2 = ''
+		for x in range(3):
+			if x <= cut:
+				child1 += ind1[i][x]
+				child2 += ind2[i][x]
+		#		print (x," <= ",cut, " child1: ", child1," child2: ", child2)
+			else:
+				child1 += ind2[i][x]
+				child2 += ind1[i][x]
+		#		print (x," >  ",cut, " child1: ", child1," child2: ", child2)
+		children1.append(child1)
+		children2.append(child2)
+	return [children1, children2]
+
 
 # def individualToBinary(ind):
 # 	temp = []
