@@ -60,11 +60,13 @@ def main():
 			print ("f1: ", f1)
 			if f1 == 0:
 				print ("Solution ", children[0], "found at iteration #", g, " when checking children solution")
+				foundSolution = True
 				break
 			f2 = getFitness(children[1])
 			print ("f2: ", f2)
 			if f2 == 0:
 				print ("Solution ", children[1], "found at iteration #", g, "  when checking children solution")
+				foundSolution = True
 				break
 
 			# Selecting the individuals for the next generation
@@ -84,7 +86,8 @@ def main():
 
 			# convertendo pra fenótipo
 			# print int('00100001', 2)
-	print ("No solution was found in 10.000 fenotype consultings")
+	if not foundSolution:
+		print ("No solution was found in 10.000 fenotype consultings")
 fitness = []
 
 # convertendo pra fenótipo
