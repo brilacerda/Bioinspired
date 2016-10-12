@@ -10,7 +10,7 @@ population_size = 200
 convergedAt = []
 population = []
 kids = []
-minimum = 100
+minimum = 1e20
 
 # 1. Qual será o tamanho da população?
 # 2. Gostaria de inserir uma parcela dos 
@@ -18,88 +18,59 @@ minimum = 100
 # 3. Usar também a recombinação feita por mhss no
 # Mini-Projeto 1
 
+class Candidate:
+	def __init__(self, value=None):
+		if value is None:
+			# inicial aleatório
+			self.value = [random()*30.0 - 15.0 for _ in range(n)]
+		else:
+			# filho de dois pais
+			self.value = value
+
+		# ao criar o candidato, já calcula o fitness
+		self.calc_fitness()
+
+	def calc_fitness(self):
+		sum1, sum2 = 0, 0
+		for i in self.value:
+			sum1 += i**2
+			sum2 += cos(c*i)
+
+		self.fitness = -a*exp(-b*sqrt(sum1/n)) - exp(sum2/n) + a + 1
+		minimum = Math.min(minimum, self.fitness)
+
+	def cross(self, other, cut):
+		new_value = self.value[:cut] + other.value[cut:]
+		return Candidate(new_value)
 
 def main():
-	minimum = 100
+	minimum = 1e20
 	# Inicialização aleatória
-	for i in range(population_size):
-		sample = generateIndividual()
-
-		# Avaliação da solução
-		fx = calculateAckley(sample)
-		if fx < minimum:
-			minimum = fx
-			print ("f(x) = ", fx)
-		if not fx:
-			population.append(sample)
-			print ("f(x)=0 when ", sample)
-			convergedAt.append(i)
-		else:
-			population.append(sample)
-			#print ("ind #%s "%i, sample)
+	population = [Candidate() for i in range(population_size)]
 
 	for z in range(200):
-		if not 200%100:
-			survivorsSelection()
-
-		recombination()
-
-def generateIndividual():
-	individual = []
-	for i in range(n):
-		v = random()*10
-		if v <= 30:
-			v-=15
-		elif v <= 60:
-			v-=45
-		elif v <= 90:
-			v-=75
-		else:
-			v = ((v-90)*3)-15
-		individual.append(v)
-	return individual
-
-# def getMinimum(fx):
-# 	if fx < minimum:
-# 		minimum = fx
-# 		print ("f(x) = ", fx)
-
-def calculateAckley(individual):
-	sum1 = 0
-	sum2 = 0
-
-	for ind in individual:
-		sum1 += ind**2
-		sum2 += cos(c*ind)
-	fx = -a*exp(-b*sqrt(sum1/n)) - exp(sum2/n) + a + 1
-	# getMinimum(fx)
-	return fx
+		for y in range(100):
+			recombination()
+		survivorsSelection()
 
 def recombination():
 	'''
 		intermediary
 	'''
-	child1 = []
-	child2 = []
-	ind1 = population[randrange(population_size)]
-	ind2 = population[randrange(population_size)]
-	cut = randrange(n)
-
-	for i in range(n):
-		if i <= cut:
-			child1.append(ind1[i])
-			child2.append(ind2[i])
-		else:
-			child1.append(ind2[i])
-			child2.append(ind1[i])
+	inds = random.sample(population, 2)
+	cut = randrange(1, n)
 	
-	if calculateAckley(child1) < calculateAckley(child2):
+	child1 = inds[0].cross(inds[1], cut)
+	child2 = inds[1].cross(inds[0], cut)
+
+	if child1.fitness < child2.fitness:
 		kids.append(child1)
 	else:
 		kids.append(child2)
 
 def survivorsSelection():
 	wholeCrew = population + kids
-# 	wholeCrew.sort()
-# 	population = wholeCrew[0:199]
-#	kids = []
+	wholeCrew.sort(key=lambda x: x.fitness)
+	population = wholeCrew[:population_size]
+	kids = []
+
