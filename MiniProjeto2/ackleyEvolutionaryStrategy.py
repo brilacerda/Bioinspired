@@ -1,5 +1,5 @@
 from math import pi, cos, sqrt, exp
-from random import random, randrange
+from random import random, randrange, sample
 
 a = 20
 b = 0.2
@@ -7,7 +7,6 @@ c = 2*pi
 n = 6
 x = 3
 population_size = 200
-convergedAt = []
 population = []
 kids = []
 minimum = 1e20
@@ -37,27 +36,39 @@ class Candidate:
 			sum2 += cos(c*i)
 
 		self.fitness = -a*exp(-b*sqrt(sum1/n)) - exp(sum2/n) + a + 1
-		minimum = Math.min(minimum, self.fitness)
+
+		global minimum
+		if self.fitness < minimum:
+			minimum = self.fitness
 
 	def cross(self, other, cut):
 		new_value = self.value[:cut] + other.value[cut:]
+
+		# mutação
+		if random() < 0.1:
+			new_value[randrange(n)] = random()*30.0 - 15.0
+
 		return Candidate(new_value)
 
 def main():
+	global minimum
 	minimum = 1e20
+
 	# Inicialização aleatória
+	global population
 	population = [Candidate() for i in range(population_size)]
 
 	for z in range(200):
 		for y in range(100):
 			recombination()
 		survivorsSelection()
+		print(minimum)
 
 def recombination():
 	'''
 		intermediary
 	'''
-	inds = random.sample(population, 2)
+	inds = sample(population, 2)
 	cut = randrange(1, n)
 	
 	child1 = inds[0].cross(inds[1], cut)
@@ -69,8 +80,14 @@ def recombination():
 		kids.append(child2)
 
 def survivorsSelection():
+	global population
+	global kids
+
 	wholeCrew = population + kids
 	wholeCrew.sort(key=lambda x: x.fitness)
 	population = wholeCrew[:population_size]
 	kids = []
+
+if __name__ == "__main__":
+	main()
 
