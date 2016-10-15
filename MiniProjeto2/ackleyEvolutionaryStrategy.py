@@ -33,11 +33,11 @@ class Candidate:
 			sum1 += i**2
 			sum2 += cos(c*i)
 
-		self.fitness = -a*exp(-b*sqrt(sum1/n)) - exp(sum2/n) + a + 1
+		self.fitness = -a*exp(-b*sqrt(sum1/n)) - exp(sum2/n) + a + exp(1)
 
 		global minimum
 		# Absolute value of the fitness
-		if fabs(self.fitness) < minimum:
+		if self.fitness < minimum:
 			minimum = self.fitness
 
 	def cross(self, other, cut):
@@ -96,3 +96,4 @@ def survivorsSelection():
 
 if __name__ == "__main__":
 	main()
+
