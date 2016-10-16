@@ -3,7 +3,10 @@ from math import cos, sqrt, exp
 from random import random, randrange, sample, gauss, seed
 
 n = 30
-gauss_stddv = 0.45
+_adjust = 0.99
+_gauss_stddv = 6
+
+gauss_stddv = _gauss_stddv
 minimum_fitness = 1e20
 
 # 3. Usar também a recombinação feita por mhss no
@@ -56,19 +59,55 @@ class Candidate:
 
 		return Candidate(new1), Candidate(new2)
 
+class LastRuns:
+	def __init__(self):
+		self.array = []
+		self.success = 0
+
+	def push(self, v):
+		if v:
+			self.success += 1
+		self.array.append(v)
+
+		if len(self.array) > 5:
+			if self.array[0]:
+				self.success -= 1
+			self.array = self.array[1:]
+
+	def percent_success(self):
+		return float(self.success) / float(len(self.array))
+
+def limit(x):
+	return min(10, max(0.001, x))
+
 # 1+1
 def run_single_individual():
 	seed()
-	print(gauss_stddv)
+	global gauss_stddv
+	print(_gauss_stddv, _adjust)
+
 	for _ in range(10):
+		gauss_stddv = _gauss_stddv
+		adjust = _adjust
+
 		x = Candidate()
+		last_runs = LastRuns()
 
 		# 200 generations
 		for i in range(100000):
 			y = x.cross_alone()
-			if y.fitness < x.fitness:
+			success = (y.fitness < x.fitness)
+			if success:
 				x = y
-		print(x.fitness)
+
+			last_runs.push(success)
+			p_success = last_runs.percent_success()
+			if p_success > 0.2:
+				gauss_stddv = limit(gauss_stddv/adjust)
+			elif p_success < 0.2:
+				gauss_stddv = limit(gauss_stddv*adjust)
+
+		print(gauss_stddv, x.fitness)
 
 # mi+lambda
 population_size = 200
