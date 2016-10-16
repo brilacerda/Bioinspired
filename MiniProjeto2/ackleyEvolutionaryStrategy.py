@@ -2,17 +2,15 @@ import math
 from math import cos, sqrt, exp
 from random import random, randrange, sample, gauss, seed
 
+# testa mudar esses parametros
 n = 30
-t1 = 3.0#1.0/sqrt(2*n)
-t2 = 1.0/sqrt(2*sqrt(n))
+t1 = 3.0# 1.0/sqrt(2*n)
+t2 = 3.0# 1.0/sqrt(2*sqrt(n))
 min_step, max_step = 1e-5, 10
 min_v, max_v = -15.0, 15.0
 iterations = 100000
 
 minimum_fitness = 1e20
-
-# 3. Usar também a recombinação feita por mhss no
-# Mini-Projeto 1
 
 def rand_in_range(x, y):
 	return x + random()*(y-x)
@@ -68,8 +66,8 @@ class Candidate:
 # 1+1
 def run_single_individual():
 	seed()
-	print(t1, t2)
 
+	# executa mais vezes do que isso, pelo menos umas 30
 	for _ in range(10):
 		x = Candidate()
 
