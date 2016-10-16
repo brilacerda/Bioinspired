@@ -30,7 +30,7 @@ class Candidate:
 			self.value = [rand_in_range(min_v, max_v) for _ in range(n)]
 			self.step = [rand_in_range(min_step, max_step) for _ in range(n)]
 		else:
-			# 2 parents child
+			# child of somebody
 			self.value, self.step = value, step
 
 		# fitness is always calculated, even when the candidate is created 
@@ -63,58 +63,37 @@ class Candidate:
 
 		return Candidate(new_v, new_s)
 
-# 1+1
-def run_single_individual():
-	seed()
-
-	# executa mais vezes do que isso, pelo menos umas 30
-	for _ in range(10):
-		x = Candidate()
-
-		for i in range(iterations):
-			y = x.cross_alone()
-			success = (y.fitness < x.fitness)
-			if success:
-				x = y
-
-		print(x.fitness)
-
 # mi+lambda
-population_size = 200
-population = []
-kids = []
+population_size = 20
 
 def run_big_population():
 	seed()
 	global minimum_fitness
-	minimum_fitness = 1e20
 
-	# Aleatory initialization
-	global population
+	for _ in range(10):
+		minimum_fitness = 1e20
 
-	# Aleatory sample
-	population = [Candidate() for i in range(population_size)]
-	# 200 generations
-	for i in range(2000):
-		# 100 kids generated
-		for j in range(100):
-			recombination()
-		survivorsSelection()
-		print(i, "generation", minimum_fitness)
+		# Aleatory initialization
+		population = [Candidate() for i in range(population_size)]
 
-def recombination():
-	'''
-		2 aleatory parents and an aleatory cut
-		The best out of the 2 children
-	'''
-	inds = sample(population, 2)
-	
-	child1, child2 = inds[0].cross(inds[1])
+		for i in range(10000):
+			kids = new_generation(population)
+			for x in population:
+				x.walk()
+			for x in kids:
+				x.walk()
 
-	if child1.fitness < child2.fitness:
-		kids.append(child1)
-	else:
-		kids.append(child2)
+			population = selectSurvivors()
+
+		print(minimum_fitness)
+
+def new_generation(population):
+	kids = []
+	for _ in range(700):
+		parents = sample(population, 2)
+		child = parents[0].cross(parents[1])
+		kids.append(child)
+	return kids
 
 def survivorsSelection():
 	'''
