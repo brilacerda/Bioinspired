@@ -2,12 +2,12 @@ import math
 from math import cos, sqrt, exp
 from random import random, randrange, sample, gauss, seed
 
-# tenta mudar esses parametros
 n = 30
+min_v, max_v = -15.0, 15.0
+# tenta mudar esses parametros
 t1 = 3.0# 1.0/sqrt(2*n)
 t2 = 3.0# 1.0/sqrt(2*sqrt(n))
-min_step, max_step = 1e-5, 10
-min_v, max_v = -15.0, 15.0
+min_step, max_step = 1e-8, 10
 iterations = 100000
 
 minimum_fitness = 1e20
@@ -55,7 +55,6 @@ class Candidate:
 		new_value = [disturb(self.value[i], new_step[i]) for i in range(n)]
 		return Candidate(new_value, new_step)
 
-# 1+1
 def run_single_individual():
 	seed()
 
