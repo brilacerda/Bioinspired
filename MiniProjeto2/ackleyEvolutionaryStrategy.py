@@ -3,27 +3,37 @@ from math import cos, sqrt, exp
 from random import random, randrange, sample, gauss, seed
 
 n = 30
-_adjust = 0.99
-_gauss_stddv = 6
+t1 = 3.0#1.0/sqrt(2*n)
+t2 = 1.0/sqrt(2*sqrt(n))
+min_step, max_step = 1e-5, 10
+min_v, max_v = -15.0, 15.0
+iterations = 100000
 
-gauss_stddv = _gauss_stddv
 minimum_fitness = 1e20
 
 # 3. Usar também a recombinação feita por mhss no
 # Mini-Projeto 1
 
-def disturb(x):
-	x += gauss(0, gauss_stddv)
-	return min(15, max(-15, x))
+def rand_in_range(x, y):
+	return x + random()*(y-x)
+
+def disturb_step(x, global_step):
+	x *= exp(global_step + t2*gauss(0, 1))
+	return min(max_step, max(min_step, x))
+
+def disturb(x, s):
+	x += s*gauss(0, 1)
+	return min(max_v, max(min_v, x))
 
 class Candidate:
-	def __init__(self, value=None):
+	def __init__(self, value=None, step=None):
 		if value is None:
 			# Aleatory initialization
-			self.value = [random()*30.0 - 15.0 for _ in range(n)]
+			self.value = [rand_in_range(min_v, max_v) for _ in range(n)]
+			self.step = [rand_in_range(min_step, max_step) for _ in range(n)]
 		else:
 			# 2 parents child
-			self.value = value
+			self.value, self.step = value, step
 
 		# fitness is always calculated, even when the candidate is created 
 		self.calc_fitness()
@@ -42,72 +52,34 @@ class Candidate:
 			minimum_fitness = self.fitness
 
 	def cross_alone(self):
-		return Candidate([disturb(x) for x in self.value])
+		global_step = t1*gauss(0, 1)
+		new_step = [disturb_step(x, global_step) for x in self.step]
+		new_value = [disturb(self.value[i], new_step[i]) for i in range(n)]
+		return Candidate(new_value, new_step)
 
 	def cross(self, other):
-		cut = randrange(1, n)
-		new1 = self.value[:cut] + other.value[cut:]
-		new2 = other.value[:cut] + self.value[cut:]
+		new_v, new_s = [], []
+		for i in range(n):
+			new_v.append(rand_in_range(self.value[i], other.value[i]))
+			new_s.append(rand_in_range(self.step[i], other.step[i]))
 
-		# mutation
-		if random() < 0.1:
-			i = randrange(n)
-			new1[i] = disturb(new1[i])
-		if random() < 0.1:
-			i = randrange(n)
-			new2[i] = disturb(new2[i])
-
-		return Candidate(new1), Candidate(new2)
-
-class LastRuns:
-	def __init__(self):
-		self.array = []
-		self.success = 0
-
-	def push(self, v):
-		if v:
-			self.success += 1
-		self.array.append(v)
-
-		if len(self.array) > 5:
-			if self.array[0]:
-				self.success -= 1
-			self.array = self.array[1:]
-
-	def percent_success(self):
-		return float(self.success) / float(len(self.array))
-
-def limit(x):
-	return min(10, max(0.001, x))
+		return Candidate(new_v, new_s)
 
 # 1+1
 def run_single_individual():
 	seed()
-	global gauss_stddv
-	print(_gauss_stddv, _adjust)
+	print(t1, t2)
 
 	for _ in range(10):
-		gauss_stddv = _gauss_stddv
-		adjust = _adjust
-
 		x = Candidate()
-		last_runs = LastRuns()
 
-		# 200 generations
-		for i in range(100000):
+		for i in range(iterations):
 			y = x.cross_alone()
 			success = (y.fitness < x.fitness)
 			if success:
 				x = y
 
-			last_runs.push(success)
-			p_success = last_runs.percent_success()
-			if p_success > 0.2:
-				gauss_stddv = limit(gauss_stddv/adjust)
-			elif p_success < 0.2:
-				gauss_stddv = limit(gauss_stddv*adjust)
-
-		print(gauss_stddv, x.fitness)
+		print(x.fitness)
 
 # mi+lambda
 population_size = 200
