@@ -2,7 +2,7 @@ import math
 from math import cos, sqrt, exp
 from random import random, randrange, sample, gauss, seed
 
-# testa mudar esses parametros
+# tenta mudar esses parametros
 n = 30
 t1 = 3.0# 1.0/sqrt(2*n)
 t2 = 3.0# 1.0/sqrt(2*sqrt(n))
@@ -30,7 +30,7 @@ class Candidate:
 			self.value = [rand_in_range(min_v, max_v) for _ in range(n)]
 			self.step = [rand_in_range(min_step, max_step) for _ in range(n)]
 		else:
-			# 2 parents child
+			# child of somebody
 			self.value, self.step = value, step
 
 		# fitness is always calculated, even when the candidate is created 
@@ -55,14 +55,6 @@ class Candidate:
 		new_value = [disturb(self.value[i], new_step[i]) for i in range(n)]
 		return Candidate(new_value, new_step)
 
-	def cross(self, other):
-		new_v, new_s = [], []
-		for i in range(n):
-			new_v.append(rand_in_range(self.value[i], other.value[i]))
-			new_s.append(rand_in_range(self.step[i], other.step[i]))
-
-		return Candidate(new_v, new_s)
-
 # 1+1
 def run_single_individual():
 	seed()
@@ -78,55 +70,6 @@ def run_single_individual():
 				x = y
 
 		print(x.fitness)
-
-# mi+lambda
-population_size = 200
-population = []
-kids = []
-
-def run_big_population():
-	seed()
-	global minimum_fitness
-	minimum_fitness = 1e20
-
-	# Aleatory initialization
-	global population
-
-	# Aleatory sample
-	population = [Candidate() for i in range(population_size)]
-	# 200 generations
-	for i in range(2000):
-		# 100 kids generated
-		for j in range(100):
-			recombination()
-		survivorsSelection()
-		print(i, "generation", minimum_fitness)
-
-def recombination():
-	'''
-		2 aleatory parents and an aleatory cut
-		The best out of the 2 children
-	'''
-	inds = sample(population, 2)
-	
-	child1, child2 = inds[0].cross(inds[1])
-
-	if child1.fitness < child2.fitness:
-		kids.append(child1)
-	else:
-		kids.append(child2)
-
-def survivorsSelection():
-	'''
-		200 bests between the population and children 
-	'''
-	global population
-	global kids
-
-	wholeCrew = population + kids
-	wholeCrew.sort(key=lambda x: x.fitness)
-	population = wholeCrew[:population_size]
-	kids = []
 
 if __name__ == "__main__":
 	run_single_individual()
