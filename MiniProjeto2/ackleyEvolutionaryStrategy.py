@@ -1,19 +1,17 @@
-from math import pi, cos, sqrt, exp, fabs
-from random import random, randrange, sample
+import math
+from math import cos, sqrt, exp
+from random import random, randrange, sample, gauss, seed
 
-a = 20
-b = 0.2
-c = 2*pi
-n = 6
-x = 3
-population_size = 200
-population = []
-kids = []
-minimum = 1e20
-
+n = 30
+gauss_stddv = 0.45
+minimum_fitness = 1e20
 
 # 3. Usar também a recombinação feita por mhss no
 # Mini-Projeto 1
+
+def disturb(x):
+	x += gauss(0, gauss_stddv)
+	return min(15, max(-15, x))
 
 class Candidate:
 	def __init__(self, value=None):
@@ -28,6 +26,7 @@ class Candidate:
 		self.calc_fitness()
 
 	def calc_fitness(self):
+		a, b, c = 20, 0.2, 2*math.pi
 		sum1, sum2 = 0, 0
 		for i in self.value:
 			sum1 += i**2
@@ -35,23 +34,51 @@ class Candidate:
 
 		self.fitness = -a*exp(-b*sqrt(sum1/n)) - exp(sum2/n) + a + exp(1)
 
-		global minimum
-		# Absolute value of the fitness
-		if self.fitness < minimum:
-			minimum = self.fitness
+		global minimum_fitness
+		if self.fitness < minimum_fitness:
+			minimum_fitness = self.fitness
 
-	def cross(self, other, cut):
-		new_value = self.value[:cut] + other.value[cut:]
+	def cross_alone(self):
+		return Candidate([disturb(x) for x in self.value])
+
+	def cross(self, other):
+		cut = randrange(1, n)
+		new1 = self.value[:cut] + other.value[cut:]
+		new2 = other.value[:cut] + self.value[cut:]
 
 		# mutation
 		if random() < 0.1:
-			new_value[randrange(n)] = random()*30.0 - 15.0
+			i = randrange(n)
+			new1[i] = disturb(new1[i])
+		if random() < 0.1:
+			i = randrange(n)
+			new2[i] = disturb(new2[i])
 
-		return Candidate(new_value)
+		return Candidate(new1), Candidate(new2)
 
-def main():
-	global minimum
-	minimum = 1e20
+# 1+1
+def run_single_individual():
+	seed()
+	print(gauss_stddv)
+	for _ in range(10):
+		x = Candidate()
+
+		# 200 generations
+		for i in range(100000):
+			y = x.cross_alone()
+			if y.fitness < x.fitness:
+				x = y
+		print(x.fitness)
+
+# mi+lambda
+population_size = 200
+population = []
+kids = []
+
+def run_big_population():
+	seed()
+	global minimum_fitness
+	minimum_fitness = 1e20
 
 	# Aleatory initialization
 	global population
@@ -59,12 +86,12 @@ def main():
 	# Aleatory sample
 	population = [Candidate() for i in range(population_size)]
 	# 200 generations
-	for z in range(200):
+	for i in range(2000):
 		# 100 kids generated
-		for y in range(100):
+		for j in range(100):
 			recombination()
 		survivorsSelection()
-		print(z, "generation", minimum)
+		print(i, "generation", minimum_fitness)
 
 def recombination():
 	'''
@@ -72,10 +99,8 @@ def recombination():
 		The best out of the 2 children
 	'''
 	inds = sample(population, 2)
-	cut = randrange(1, n)
 	
-	child1 = inds[0].cross(inds[1], cut)
-	child2 = inds[1].cross(inds[0], cut)
+	child1, child2 = inds[0].cross(inds[1])
 
 	if child1.fitness < child2.fitness:
 		kids.append(child1)
@@ -95,5 +120,5 @@ def survivorsSelection():
 	kids = []
 
 if __name__ == "__main__":
-	main()
+	run_single_individual()
 
